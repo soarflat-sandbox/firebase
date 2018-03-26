@@ -25,8 +25,52 @@ exports.addWelcomeMessages = functions.auth.user().onCreate(event => {
   }).then(() => console.log('Welcome message written to database.'));
 });
 
-// TODO(DEVELOPER): Write the addWelcomeMessages Function here.
+exports.sendNotifications = functions.database.ref('/messages/{messageId}').onCreate(event => {
+  const snapshot = event.data;
 
-// TODO(DEVELOPER): Write the blurOffensiveImages Function here.
+  // 通知の詳細
+  const text = snapshot.val().text;
+  const payload = {
+    notification: {
+      title: `${snapshot.val().name} posted ${text
+        ? 'a message'
+        : 'an image'}`,
+      body: text
+        ? (text.length <= 100
+          ? text
+          : text.substring(0, 97) + '...')
+        : '',
+      icon: snapshot.val().photoUrl || '/images/profile_placeholder.png',
+      click_action: `https://${functions.config().firebase.authDomain}`
+    }
+  };
 
-// TODO(DEVELOPER): Write the sendNotifications Function here.
+  // Firebaseリアルタイムデータベースからすべてのユーザのデバイストークンを収集し、それぞれに通知を送信する
+  return admin.database().ref('fcmTokens').once('value').then(allTokens => {
+    if (allTokens.val()) {
+      // 全てのトークンをリストにする
+      const tokens = Object.keys(allTokens.val());
+
+      // すべてのトークンに通知を送信する
+      return admin.messaging().sendToDevice(tokens, payload).then(response => {
+
+        // 各メッセージについて、エラーがあったかどうかをチェックする
+        // ユーザーから取得したトークンがブラウザやデバイスで使用されていない場合にエラーが発生する
+        // たとえば、ユーザーがブラウザセッションの通知許可を取り消した場合など
+        const tokensToRemove = [];
+        response.results.forEach((result, index) => {
+          const error = result.error;
+          if (error) {
+            console.error('Failure sending notification to', tokens[index], error);
+            // 登録されていないトークンをクリーンアップする
+            if (error.code === 'messaging/invalid-registration-token' ||
+              error.code === 'messaging/registration-token-not-registered') {
+              tokensToRemove.push(allTokens.ref.child(tokens[index]).remove());
+            }
+          }
+        });
+        return Promise.all(tokensToRemove);
+      });
+    }
+  });
+});
