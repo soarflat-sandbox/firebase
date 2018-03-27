@@ -10,7 +10,9 @@
     "ignore": [
       "firebase.json",
       "database-rules.json",
-      "storage.rules"
+      "storage.rules",
+      "README.md",
+      "README_resources"
     ]
   }
 }

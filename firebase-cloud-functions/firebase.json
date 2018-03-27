@@ -11,10 +11,7 @@
       "firebase.json",
       "database-rules.json",
       "storage.rules",
-      "package.json",
-      "package-lock.json",
       "README.md",
-      "node_modules",
       "functions"
     ],
     "headers": [{
