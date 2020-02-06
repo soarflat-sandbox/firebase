@@ -8,6 +8,11 @@ Google Cloud Functions を利用して[チャット](../firebase-web)を改善�
 - Auth、Cloud Storage、および Realtime Database イベントに基づいて Cloud Functions をトリガーする。
 - Web アプリケーションに Firebase Cloud Messaging サポートを追加する。
 
+**このサンプルを動かすためには Firebase プロジェクトを作成後、以下の設定を変更する必要がある。**
+
+- FireStore を Datastore モードからネイティブモードに変更する
+- Google アカウントによる認証を有効にする
+
 ## Firebase CLI
 
 ### Firebase CLI のインストール
@@ -79,3 +84,36 @@ $ firebase use
 $ firebase use [エイリアス名]
 # staging エイリアスに変更したい場合は firebase use staging
 ```
+
+特定のエイリアスの削除したい場合は、以下のコマンドを実行する。
+
+```bash
+$ firebase use --unalias [エイリアス名]
+# staging エイリアスに変更したい場合は firebase use staging
+```
+
+## アプリケーションのデプロイ
+
+以下のコマンドでアプリケーションをデプロイする。
+
+```shell
+$ firebase deploy --except functions
+```
+
+`--except`オプションでデプロイするターゲットを除外できる。今回は`functions`（Cloud Functions for Firebase）以外がデプロイされる。
+
+`--except`オプションはドキュメントにはなかったが、`--help`オプションで使い方を確認できる。
+
+```shell
+$ firebase deploy --help
+Usage: firebase deploy [options]
+
+deploy code and assets to your Firebase project
+
+Options:
+  # 省略...
+  --except <targets>       deploy to all targets except specified (e.g. "database")
+  -h, --help               output usage information
+```
+
+### firebase.json
