@@ -8,4 +8,74 @@ Google Cloud Functions を利用して[チャット](../firebase-web)を改善�
 - Auth、Cloud Storage、および Realtime Database イベントに基づいて Cloud Functions をトリガーする。
 - Web アプリケーションに Firebase Cloud Messaging サポートを追加する。
 
-### MEMO
+## Firebase CLI
+
+### Firebase CLI のインストール
+
+```bash
+$ npm -g install firebase-tools
+```
+
+インストールが成功すれば、以下のコマンドでバージョンが出力される。
+
+```bash
+$ firebase --version
+7.12.1 # バージョンが出力
+```
+
+### Firebase CLI の認証
+
+以下のコマンドでブラウザでログイン画面が立ち上がる。
+
+```bash
+$ firebase login
+```
+
+ログインしたアカウントを選択し、Firebase CLI との連携を許可すれば認証が完了する。
+
+### プロジェクトエイリアスを追加する
+
+プロジェクトエイリアスを利用すれば、１つのディレクトリに複数の Firebase プロジェクトを関連付けることができる。
+
+そのため、１つのディレクトリにステージング（`staging`）と本番環境（`production`）用の Firebase プロジェクトを関連付けると言った使い方ができる。
+
+プロジェクトエイリアスを追加するためには、以下のコマンドを実行する。
+
+```bash
+$ firebase use --add
+# エイリアスを追加したいプロジェクトを選択する
+? Which project do you want to add? (Use arrow keys)
+❯ project1
+  project2
+  project3
+# エイリアスの名前を指定する
+? What alias do you want to use for this project? (e.g. staging) staging
+```
+
+上記の場合、`project1`という名前の Firebase プロジェクトに`staging`というエイリアスを追加している。
+
+エイリアスを追加すると、`.firebaserc`というファイルが生成される。
+
+このファイルには以下のように、ディレクトリがどのプロジェクトのエイリアスに紐づいているのかが記述されている。
+
+```json
+{
+  "projects": {
+    // エイリアス名: Firebase プロジェクト名
+    "staging": "project1"
+  }
+}
+```
+
+定義されているプロジェクトエイリアスは以下のコマンドでも確認できる。
+
+```bash
+$ firebase use
+```
+
+プロジェクトエイリアスを変更したい場合は、以下のコマンドを実行する。
+
+```bash
+$ firebase use [エイリアス名]
+# staging エイリアスに変更したい場合は firebase use staging
+```
